@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand-md d-none d-md-flex border-0" id="topbar">
+  <div class="container-fluid justify-content-end px-4">
+    <div class="navbar-user justify-content-center" id="sidebarUser">
+      <a routerLink="/invite" class="d-block mr-4">
+        <!-- Title -->
+        <h6 class="text-uppercase text-secondary mb-2">
+          Rank
+        </h6>
+        <!-- Heading -->
+        <span class="h4 mb-0 text-white">
+          Star&nbsp;&bull;&nbsp;6,500,000&nbsp;DSV
+        </span>
+      </a>
+      <!--Account display-->
+      <button class="btn btn-white btn-block p-0 pr-3 rounded-xl text-left text-truncate" style="width: 12rem;" (click)="reloadAll()"
+      *ngIf="user_address !== ZERO_ADDR">
+        <div class="avatar avatar-sm avatar-online mr-2">
+          <img src="assets/img/avatars/profiles/eth-address.png" class="avatar-img rounded-circle" alt="...">
+        </div>
+        {{user_address}}
+      </button>
+      <button class="btn btn-white btn-block p-0 pr-3 rounded-xl text-left text-truncate" (click)="reloadAll()" *ngIf="user_address == ZERO_ADDR">
+        <div class="avatar avatar-sm avatar-offline mr-2">
+          <img src="assets/img/avatars/profiles/eth-address.png" class="avatar-img rounded-circle" alt="...">
+        </div>
+        <ng-container i18n="@@headerConnectWalletCTA">Connect Wallet</ng-container>
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+
+<!-- PREHADER
+================================================== -->
+<div *ngIf="errorMsg !== '' ">
+  <div class="alert alert-warning rounded-0 mb-0">
+    {{errorMsg}}
+  </div>
+</div>
+<div *ngIf="phase == 1 && 7 > days && seconds > 0 && !checkRouterURL('/invest')">
+  <div class="alert alert-warning rounded-0 mb-0">
+    <ng-container i18n="@@managerAlert1">Please note you have only</ng-container>&nbsp;{{days}}&nbsp;<ng-container
+      i18n="@@managerAlert2">days left to manage. You MUST sell all of your investments during this time, or you WILL
+      LOSE your staked Kairo tokens.</ng-container>
+  </div>
+</div>
