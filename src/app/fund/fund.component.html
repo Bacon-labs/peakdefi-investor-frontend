@@ -10,14 +10,17 @@
           <div class="col">
             <div class="row justify-content-between align-items-center mb-4 mb-lg-5">
               <div class="col">
-                <div class="text-secondary">
-                  Fund title • Value of holdings • USD
-                </div>
+                <nav aria-label="breadcrumb" *ngIf="router.url === '/fund'">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a routerLink="/portfolio">Portfolio</a></li>
+                    <li class="breadcrumb-item active" aria-current="fund">Fund title • Value of holdings • USD</li>
+                  </ol>
+                </nav>
                 <h1 class="display-3 mt-3 mb-0 d-none d-lg-block">
-                  {{investmentBalance.toFormat(2)}}
+                  ${{investmentBalance.toFormat(2)}}
                 </h1>
                 <h1 class="display-4 mt-3 mb-1 d-block d-lg-none">
-                  {{investmentBalance.toFormat(2)}}
+                  ${{investmentBalance.toFormat(2)}}
                 </h1>
                 <div class="small">
                   Total holdings: {{sharesBalance.toFormat(4)}} BTKS

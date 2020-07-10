@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import BigNumber from 'bignumber.js';
+import { Router } from '@angular/router';
 import { isUndefined, isNull } from 'util';
 import { Chart } from 'chart.js';
 
@@ -62,7 +63,7 @@ export class FundComponent extends ApolloEnabled implements OnInit {
 
   isLoading: Boolean;
 
-  constructor(private apollo: Apollo) {
+  constructor(private router: Router, private apollo: Apollo) {
     super();
 
     this.sharesPrice = new BigNumber(0);
@@ -105,7 +106,9 @@ export class FundComponent extends ApolloEnabled implements OnInit {
 
     this.isLoading = true;
   }
-
+  checkRouterURL(route) {
+    return this.router.url === route;
+  }
   ngOnInit() {
     $('[data-toggle="tooltip"]').tooltip();
     $('#modalInvestorBuy').on('hidden.bs.modal', () => {
