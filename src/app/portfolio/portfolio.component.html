@@ -28,21 +28,14 @@
             </div>
             <!-- Button -->
             <a href="#" data-toggle="modal" data-target="#depositMoney" class="btn btn-lg btn-primary lift mb-5 mr-3">
-              <i class="fe fe-plus h3 mr-2 align-bottom"></i> Buy
+              <i class="fe fe-plus h3 mr-2 align-self-baseline"></i> Buy
             </a>
             <!-- Button -->
             <a href="#" data-toggle="modal" data-target="#withdrawMoney" class="btn btn-lg btn-white lift mb-5">
-              <i class="fe fe-minus h3 mr-2 align-bottom"></i> Sell
+              <i class="fe fe-minus h3 mr-2 align-baseline"></i> Sell
             </a>
             <in-app-notification></in-app-notification>
-            <ul class="nav nav-tabs header-tabs" id="myTab" role="tablist">
-              <li class="nav-item">
-                <a class="nav-link active text-center font-weight-bold h3 mb-0" id="Holdings-tab" data-toggle="tab" href="#Holdings" role="tab" aria-controls="Holdings" aria-selected="true">Holdings</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-center font-weight-bold h3 mb-0" id="transactions-tab" data-toggle="tab" href="#transactions" role="tab" aria-controls="transactions" aria-selected="false">Transactions</a>
-              </li>
-            </ul>
+            <h3 class="mt-3 mb-0">Holdings</h3>
           </div>
         </div> <!-- / .row -->
       </div> <!-- / .header-body -->
@@ -52,117 +45,123 @@
 
   <!-- CARDS -->
   <div class="container-fluid mb-6">
-    <div class="tab-content" id="myTabContent">
-      <div class="tab-pane fade show active" id="Holdings" role="tabpanel" aria-labelledby="Holdings-tab">
-        <div class="row d-flex-wrap">
-          <div class="col-6">
+    <div class="row d-flex-wrap">
+      <!-- fund -->
+      <div class="col-6">
 
-            <!-- fund  -->
-            <a routerLink="/fund">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row align-items-center">
-                    <div class="col mb-3 mb-lg-0">
+        <a routerLink="/fund">
+          <div class="card">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col mb-3 mb-lg-0">
 
-                      <!-- Title -->
-                      <h6 class="text-uppercase text-secondary mb-3">
-                        Fund title
-                      </h6>
+                  <!-- Title -->
+                  <h6 class="text-uppercase text-secondary mb-3">
+                    Fund title
+                  </h6>
 
-                      <!-- Heading -->
-                      <span class="h2 text-white mb-0 mr-2 d-block">
-                        ${{investmentBalance.toFormat(4)}}
-                      </span>
-                      <!-- Heading -->
-                      <span class="small text-secondary">
-                        {{sharesBalance.toFormat(4)}} PDF1
-                      </span>
+                  <!-- Heading -->
+                  <span class="h2 text-white mb-0 mr-2 d-block">
+                    ${{investmentBalance.toFormat(4)}}
+                  </span>
+                  <!-- Heading -->
+                  <span class="small text-secondary">
+                    {{sharesBalance.toFormat(4)}} PDF1
+                  </span>
 
-                    </div>
-                    <div class="col-auto">
-
-                      <div class="avatar avatar-sm">
-                        <img src="assets/img/avatars/profiles/eth-address.png" class="avatar-img rounded-circle" alt="...">
-                      </div>
-
-                    </div>
-                  </div> <!-- / .row -->
                 </div>
-              </div>
-            </a>
+                <div class="col-auto">
 
-          </div>
-        </div> <!-- / .row -->
-      </div>
-      <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
-        <div class="row">
-          <div class="col-12">
-
-            <!-- Recent activity -->
-            <div class="card">
-              <div class="card-header">
-                <div class="row align-items-center">
-                  <div class="col">
-
-                    <!-- Title -->
-                    <h4 class="card-header-title">
-                      Recent activity
-                    </h4>
-
+                  <div class="avatar avatar-sm">
+                    <img src="assets/img/avatars/profiles/eth-address.png" class="avatar-img rounded-circle" alt="...">
                   </div>
-                </div> <!-- / .row -->
-              </div>
-              <div class="table-responsive mb-0" data-list="{&quot;valueNames&quot;: [&quot;tx-date&quot;, &quot;tx-details&quot;, &quot;tx-amount&quot;]}">
-                <table class="table table-sm table-nowrap card-table">
-                  <thead>
-                    <tr>
-                      <th>
-                        <a href="#" class="text-secondary list-sort" data-sort="tx-date">
-                          Date
-                        </a>
-                      </th>
-                      <th>
-                        <a href="#" class="text-secondary list-sort" data-sort="tx-details">
-                          Details
-                        </a>
-                      </th>
-                      <th class="text-right">
-                        <a href="#" class="text-secondary list-sort" data-sort="tx-amount">
-                          Amount
-                        </a>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="list">
-                    <tr *ngFor="let entry of depositWithdrawHistory">
-                      <td class="tx-date">
-                        {{toDateTimeString(entry.timestamp)}}
-                      </td>
-                      <td class="type-details">
-                        <h4 class="mb-2" *ngIf="entry.isDeposit">
-                          Bought shares
-                        </h4>
-                        <h4 class="mb-2" *ngIf="!entry.isDeposit">
-                          Sold shares
-                        </h4>
-                        <a class="align-items-center" href="https://etherscan.io/tx/{{entry.txHash}}" target="_blank">
-                          Tx details<i class="fe fe-external-link ml-2"></i>
-                        </a>
-                      </td>
-                      <td class="type-amount text-right">
-                        {{toBigNumber(entry.amountInDAI).toFormat(4)}}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
 
+                </div>
+              </div> <!-- / .row -->
+            </div>
           </div>
-        </div> <!-- / .row -->
+        </a>
+
+      </div> 
+
+      <!-- fund -->
+      <div class="col-6">
+
+        <a routerLink="/fund">
+          <div class="card">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col mb-3 mb-lg-0">
+
+                  <!-- Title -->
+                  <h6 class="text-uppercase text-secondary mb-3">
+                    Fund title
+                  </h6>
+
+                  <!-- Heading -->
+                  <span class="h2 text-white mb-0 mr-2 d-block">
+                    $0.0000
+                  </span>
+                  <!-- Heading -->
+                  <span class="small text-secondary">
+                    0.0000 BTKS
+                  </span>
+
+                </div>
+                <div class="col-auto">
+
+                  <div class="avatar avatar-sm">
+                    <img src="assets/img/avatars/profiles/eth-address.png" class="avatar-img rounded-circle" alt="...">
+                  </div>
+
+                </div>
+              </div> <!-- / .row -->
+            </div>
+          </div>
+        </a>
+
       </div>
-    </div>
+      <!-- fund -->
+      <div class="col-6">
+
+        <a routerLink="/fund">
+          <div class="card">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col mb-3 mb-lg-0">
+
+                  <!-- Title -->
+                  <h6 class="text-uppercase text-secondary mb-3">
+                    Fund title
+                  </h6>
+
+                  <!-- Heading -->
+                  <span class="h2 text-white mb-0 mr-2 d-block">
+                    $0.0000
+                  </span>
+                  <!-- Heading -->
+                  <span class="small text-secondary">
+                    0.0000 BTKS
+                  </span>
+
+                </div>
+                <div class="col-auto">
+
+                  <div class="avatar avatar-sm">
+                    <img src="assets/img/avatars/profiles/eth-address.png" class="avatar-img rounded-circle" alt="...">
+                  </div>
+
+                </div>
+              </div> <!-- / .row -->
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </div> <!-- / .row -->
     <app-footer></app-footer>
   </div>
 
 </div><!-- / .main-content -->
+<modal-buy-share></modal-buy-share>
+<modal-sell-share></modal-sell-share>

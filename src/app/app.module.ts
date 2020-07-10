@@ -11,18 +11,17 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { InAppNotificationComponent } from './in-app-notification/in-app-notification.component';
 import { RewardsComponent } from './rewards/rewards.component';
-import { ModalBuyRepTokenComponent } from './modal-buy-rep-token/modal-buy-rep-token.component';
-import { ModalCreateFundComponent } from './modal-create-fund/modal-create-fund.component';
+import { InviteComponent } from './invite/invite.component';
+import { ModalBuyShareComponent } from './modal-buy-share/modal-buy-share.component';
+import { ModalSellShareComponent } from './modal-sell-share/modal-sell-share.component';
+import { ModalStakeComponent } from './modal-stake/modal-stake.component';
 import { FundComponent } from './fund/fund.component';
-import { FundActiveTradeComponent } from './fund-active-trade/fund-active-trade.component';
-import { FundTradeHistoryComponent } from './fund-trade-history/fund-trade-history.component';
+import { FundOverviewComponent } from './fund-overview/fund-overview.component';
+import { FundTransactionHistoryComponent } from './fund-transaction-history/fund-transaction-history.component';
 import { FundRankingComponent } from './fund-ranking/fund-ranking.component';
 import { SideNavComponent } from './side-nav/side-nav.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
-
 import { InvestmentsComponent } from './investments/investments.component';
-import { UpgradeComponent } from './upgrade/upgrade.component';
-import { CommissionsComponent } from './commissions/commissions.component';
 import { InvestorComponent } from './investor/investor.component';
 import { ManageronboardingComponent } from './manager-onboarding/manageronboarding.component';
 import { InvestoronboardingComponent } from './investor-onboarding/investoronboarding.component';
@@ -47,6 +46,11 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'invite',
+    component: InviteComponent,
+    pathMatch: 'full'
+  },
+  {
     path: 'fund',
     component: FundComponent,
     pathMatch: 'full'
@@ -54,16 +58,6 @@ const routes: Routes = [
   {
     path: 'investments',
     component: InvestmentsComponent,
-    pathMatch: 'full'
-  },
-  {
-    path: 'upgrades',
-    component: UpgradeComponent,
-    pathMatch: 'full'
-  },
-  {
-    path: 'commissions',
-    component: CommissionsComponent,
     pathMatch: 'full'
   },
   {
@@ -101,17 +95,17 @@ const routes: Routes = [
     InAppNotificationComponent,
     FooterComponent,
     RewardsComponent,
-    ModalBuyRepTokenComponent,
-    ModalCreateFundComponent,
+    InviteComponent,
+    ModalBuyShareComponent,
+    ModalSellShareComponent,
+    ModalStakeComponent,
     FundComponent,
-    FundActiveTradeComponent,
-    FundTradeHistoryComponent,
+    FundOverviewComponent,
+    FundTransactionHistoryComponent,
     FundRankingComponent,
     SideNavComponent,
     PortfolioComponent,
     InvestmentsComponent,
-    UpgradeComponent,
-    CommissionsComponent,
     InvestorComponent,
     InvestoronboardingComponent,
     ManageronboardingComponent,

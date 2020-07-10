@@ -1,13 +1,25 @@
 <nav class="navbar navbar-expand-md d-none d-md-flex border-0" id="topbar">
-  <div class="container-fluid justify-content-end px-4">
-    <div class="navbar-user justify-content-center" id="sidebarUser">
+  <div class="container-fluid px-4 d-flex">
+    <div class="navbar-text" *ngIf="router.url === '/fund'">
+      <h6 class="text-uppercase text-secondary mb-2">
+        <ng-container i18n="@@timeCounterTitle">Time left</ng-container>&nbsp;<ng-container *ngIf="phase == 0"
+          i18n="@@timeCounterActionIntermission">until managing begins</ng-container>
+        <ng-container *ngIf="phase == 1" i18n="@@timeCounterActionManage">to buy/sell</ng-container>
+      </h6>
+      <h4 class="mb-0">
+        {{days}}<ng-container i18n="@@timeLeftInDays">d</ng-container>&nbsp;{{hours}}<ng-container
+          i18n="@@timeLeftInHours">h</ng-container>&nbsp;{{minutes}}<ng-container i18n="@@timeLeftInMinutes">m
+        </ng-container>&nbsp;{{seconds}}<ng-container i18n="@@timeLeftInSeconds">s</ng-container>
+      </h4>
+    </div>
+    <div class="navbar-user justify-content-center ml-auto" id="sidebarUser">
       <a routerLink="/invite" class="d-block mr-4">
         <!-- Title -->
         <h6 class="text-uppercase text-secondary mb-2">
           Rank
         </h6>
         <!-- Heading -->
-        <span class="h4 mb-0 text-white">
+        <span class="h4 mb-0">
           Star&nbsp;&bull;&nbsp;6,500,000&nbsp;DSV
         </span>
       </a>
@@ -30,18 +42,3 @@
   </div>
 </nav>
 
-
-<!-- PREHADER
-================================================== -->
-<div *ngIf="errorMsg !== '' ">
-  <div class="alert alert-warning rounded-0 mb-0">
-    {{errorMsg}}
-  </div>
-</div>
-<div *ngIf="phase == 1 && 7 > days && seconds > 0 && !checkRouterURL('/invest')">
-  <div class="alert alert-warning rounded-0 mb-0">
-    <ng-container i18n="@@managerAlert1">Please note you have only</ng-container>&nbsp;{{days}}&nbsp;<ng-container
-      i18n="@@managerAlert2">days left to manage. You MUST sell all of your investments during this time, or you WILL
-      LOSE your staked Kairo tokens.</ng-container>
-  </div>
-</div>

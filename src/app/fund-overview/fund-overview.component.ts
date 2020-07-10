@@ -1,126 +1,88 @@
 import { Component, OnInit } from '@angular/core';
-import BigNumber from 'bignumber.js';
-import { isUndefined, isNull } from 'util';
+import { Router } from '@angular/router';
+import { AppComponent } from '../app.component';
+import { BigNumber } from 'bignumber.js';
 import { Chart } from 'chart.js';
 
 declare var $: any;;
 
 import {
-  user, timer, tokens, investor_actions
-} from '../../betokenjs/helpers';
+    user, timer, error_notifications, manager_actions, refresh_actions
+  } from '../../betokenjs/helpers';
 
 import { ApolloEnabled } from '../apollo';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 @Component({
-  selector: 'app-fund',
-  templateUrl: './fund.component.html'
+  selector: 'app-fund-overview',
+  templateUrl: './fund-overview.component.html'
 })
-export class FundComponent extends ApolloEnabled implements OnInit {
+
+export class FundOverviewComponent extends ApolloEnabled implements OnInit {
+  userRanking: String;
+  userValue: BigNumber;
+  userROI: BigNumber;
+  expectedCommission: BigNumber;
   sharesPrice: BigNumber;
   avgMonthReturn: BigNumber;
   currMoROI: BigNumber;
+  totalUser: Number;
   AUM: BigNumber;
   maxDrawdown: BigNumber;
+  sortinoRatio: BigNumber;
   standardDeviation: BigNumber;
-  tokenData: Array<Object>;
-  isUpgradeEnd: boolean;
-
-  sharesBalance: BigNumber;
-  investmentBalance: BigNumber;
-
-  buySharesAmount: BigNumber;
-  buyTokenAmount: BigNumber;
-  sellSharesAmount: BigNumber;
-  sellTokenAmount: BigNumber;
+  portfolioValueInDAI: BigNumber;
+  apy: BigNumber;
 
   hasDrawnChart: boolean;
   performanceChart: any;
+  chartTabId: Number;
+  shouldDrawChart: Boolean;
   sharesPriceHistory: any;
-  btcPriceHistory: any;
-  ethPriceHistory: any;
+  aumHistory: any;
   historyWindowSize: number;
 
-  buyStep: Number;
-  sellStep: Number;
   days: Number;
   hours: Number;
   minutes: Number;
   seconds: Number;
   phase: Number;
 
-  checkboxes: Array<boolean>;
-  selectedTokenSymbol: String;
-  selectedTokenBalance: BigNumber;
-  transactionId: String;
-  continueEnabled: Boolean;
-
-  depositWithdrawHistory: Array<Object>;
-
-  errorMsg: String;
-
-  isLoading: Boolean;
-
-  constructor(private apollo: Apollo) {
+  constructor(private ms: AppComponent, private router: Router, private apollo: Apollo) {
     super();
 
+    this.userRanking = '';
+    this.userValue = new BigNumber(0);
+    this.userROI = new BigNumber(0);
+    this.expectedCommission = new BigNumber(0);
     this.sharesPrice = new BigNumber(0);
     this.avgMonthReturn = new BigNumber(0);
     this.currMoROI = new BigNumber(0);
+    this.totalUser = 0;
     this.AUM = new BigNumber(0);
     this.maxDrawdown = new BigNumber(0);
+    this.sortinoRatio = new BigNumber(0);
     this.standardDeviation = new BigNumber(0);
-    this.tokenData = new Array<Object>();
-    this.isUpgradeEnd = false;
-
-    this.sharesBalance = new BigNumber(0);
-    this.investmentBalance = new BigNumber(0);
-
-    this.buySharesAmount = new BigNumber(0);
-    this.buyTokenAmount = new BigNumber(0);
-    this.sellSharesAmount = new BigNumber(0);
-    this.sellTokenAmount = new BigNumber(0);
+    this.portfolioValueInDAI = new BigNumber(0);
+    this.apy = new BigNumber(0);
 
     this.hasDrawnChart = false;
+    this.chartTabId = 0;
+    this.shouldDrawChart = true;
     this.historyWindowSize = 1000;
 
-    this.buyStep = 0;
-    this.sellStep = 0;
     this.days = 0;
     this.hours = 0;
     this.minutes = 0;
     this.seconds = 0;
-    this.phase = 0;
-
-    this.checkboxes = [false, false, false];
-    this.selectedTokenSymbol = 'DAI';
-    this.selectedTokenBalance = new BigNumber(0);
-    this.transactionId = '';
-    this.continueEnabled = false;
-
-    this.depositWithdrawHistory = new Array<Object>();
-
-    this.errorMsg = "";
-
-    this.isLoading = true;
+    this.phase = -1;
   }
 
   ngOnInit() {
-    $('[data-toggle="tooltip"]').tooltip();
-    $('#modalInvestorBuy').on('hidden.bs.modal', () => {
-      this.resetModals();
-    });
-    $('#modalInvestorSell').on('hidden.bs.modal', () => {
-      this.resetModals();
-    });
-
-    this.tokenData = tokens.token_data();
-    this.updateTimer();
-    this.getTokenBalance(this.selectedTokenSymbol);
-    this.selectedTokenSymbol = this.tokenData[0]['symbol'];
-    setInterval(() => this.updateTimer(), 1000);
     this.createQuery();
+    $('[data-toggle="tooltip"]').tooltip();
+    setInterval(() => this.updateTimer(), 1000);
   }
 
   createQuery() {
@@ -132,32 +94,31 @@ export class FundComponent extends ApolloEnabled implements OnInit {
         query: gql`
           {
             fund(id: "BetokenFund") {
-              cyclePhase
-              totalFundsAtPhaseStart
               aum
+              kairoTotalSupply
+              totalFundsInDAI
+              cyclePhase
+              cycleTotalCommission
+              totalFundsAtPhaseStart
               sharesPrice
               sharesPriceHistory(orderBy: timestamp, orderDirection: desc, first: ${this.historyWindowSize}) {
                 timestamp
                 value
               }
-              hasFinalizedNextVersion
-            }
-            investor(id: "${userAddress}") {
-              sharesBalance
-              depositWithdrawHistory(orderBy: timestamp, orderDirection: desc, first: 1000) {
+              aumHistory(orderBy: timestamp, orderDirection: desc, first: ${this.historyWindowSize}) {
                 timestamp
-                isDeposit
-                amountInDAI
-                txHash
+                value
               }
             }
-            btcPriceHistory: tokenPrices(where: { tokenSymbol: "WBTC" }, orderBy: timestamp, orderDirection: desc, first: ${this.historyWindowSize}) {
-              timestamp
-              priceInDAI
+            manager(id: "${userAddress}") {
+              kairoBalance
+              kairoBalanceWithStake
+              baseStake
+              riskTaken
+              riskThreshold
             }
-            ethPriceHistory: tokenPrices(where: { tokenSymbol: "ETH" }, orderBy: timestamp, orderDirection: desc, first: ${this.historyWindowSize}) {
-              timestamp
-              priceInDAI
+            managers(orderBy: "kairoBalanceWithStake", orderDirection: desc, first: 1000, where: {kairoBalanceWithStake_gt: 0}) {
+              id
             }
           }
         `
@@ -166,205 +127,87 @@ export class FundComponent extends ApolloEnabled implements OnInit {
   }
 
   handleQuery({ data, loading }) {
-    this.isLoading = loading || isUndefined(loading);
-
     if (!loading) {
       let fund = data['fund'];
-      let investor = data['investor'];
+      let manager = data['manager'];
+      let managers = data['managers'];
+
+      if (manager) {
+        this.userValue = this.getManagerKairoBalance(manager);
+        this.userROI = this.userValue.div(manager.baseStake).minus(1).times(100);
+        if (this.userROI.isNaN()) {
+          this.userROI = new BigNumber(0);
+        }
+        // calculate expected commission
+        if (+fund.kairoTotalSupply > 0) {
+          if (fund.cyclePhase === 'INTERMISSION') {
+            // Actual commission that will be redeemed
+            this.expectedCommission = user.commission_balance();
+          } else {
+            // Expected commission based on previous average ROI
+            if (+manager.riskThreshold !== 0) {
+              let actualKairoSupply = new BigNumber(fund.kairoTotalSupply).div(fund.totalFundsInDAI).times(fund.aum);
+              let totalProfit = new BigNumber(fund.aum).minus(fund.totalFundsAtPhaseStart);
+              totalProfit = BigNumber.max(totalProfit, 0);
+              let commission = totalProfit.div(actualKairoSupply).times(this.userValue).times(user.commission_rate());
+              let assetFee = new BigNumber(fund.aum).div(actualKairoSupply).times(this.userValue).times(user.asset_fee_rate());
+              this.expectedCommission = commission.plus(assetFee).times(manager.riskTaken).div(manager.riskThreshold);
+            } else {
+              this.expectedCommission = new BigNumber(0);
+            }
+          }
+        }
+      }
 
       this.AUM = new BigNumber(fund.aum);
+      let userAddress = user.address().toLowerCase();
+      this.userRanking = managers.findIndex((x) => x.id === userAddress) + 1;
+      this.totalUser = managers.length;
       this.sharesPrice = new BigNumber(fund.sharesPrice);
       this.currMoROI = this.AUM.div(fund.totalFundsAtPhaseStart).minus(1).times(100);
+      this.apy = this.currMoROI.div(100).plus(1).pow(12).minus(1).times(100);
       if (fund.cyclePhase === 'INTERMISSION') {
         this.currMoROI = new BigNumber(0);
+        this.apy = new BigNumber(0);
       }
-      this.isUpgradeEnd = fund.hasFinalizedNextVersion;
-
-      if (!isNull(investor)) {
-        this.sharesBalance = new BigNumber(investor.sharesBalance);
-        this.depositWithdrawHistory = investor.depositWithdrawHistory;
-        this.investmentBalance = this.sharesBalance.times(this.sharesPrice);
-      }
+      this.portfolioValueInDAI = this.userValue.div(fund.kairoTotalSupply).times(fund.totalFundsInDAI);
 
       // draw chart
       this.sharesPriceHistory = this.reversedCopyOfArray(fund.sharesPriceHistory);
-      this.btcPriceHistory = this.reversedCopyOfArray(data['btcPriceHistory']);
-      this.ethPriceHistory = this.reversedCopyOfArray(data['ethPriceHistory']);
+      this.aumHistory = this.reversedCopyOfArray(fund.aumHistory);
       this.calcStats();
-      this.chartDraw();
+      this.chartDraw(this.chartTabId);
     }
   }
-
-  refreshDisplay() {
-    this.isLoading = true;
-    this.query.refetch().then((result) => this.handleQuery(result));
-  }
-
   updateTimer() {
     this.days = timer.day();
     this.hours = timer.hour();
     this.minutes = timer.minute();
     this.seconds = timer.second();
+  }
+
+  refreshDisplay() {
+    this.query.refetch().then((result) => this.handleQuery(result));
     this.phase = timer.phase();
   }
 
-  refreshBuyOrderDetails(val) {
-    this.buyTokenAmount = new BigNumber(val);
-    if (!this.buyTokenAmount.isNaN()) {
-      this.buySharesAmount = this.buyTokenAmount.times(this.assetSymbolToPrice(this.selectedTokenSymbol)).div(this.sharesPrice);
-    } else {
-      this.buyTokenAmount = new BigNumber(0);
-      this.buySharesAmount = new BigNumber(0);
-    }
+  nextPhase() {
+    manager_actions.nextPhase();
+  }
+  async reloadAll() {
+    await refresh_actions.reload_all();
+    this.refreshDisplay();
   }
 
-  refreshSellOrderDetails(val) {
-    this.sellSharesAmount = new BigNumber(val);
-    if (!this.sellSharesAmount.isNaN()) {
-      this.sellTokenAmount = this.sellSharesAmount.times(this.sharesPrice).div(this.assetSymbolToPrice(this.selectedTokenSymbol));
-    } else {
-      this.sellSharesAmount = new BigNumber(0);
-      this.sellTokenAmount = new BigNumber(0);
-    }
-  }
-
-  maxBuyAmount() {
-    $('#sharesAmountToBuy').val(this.selectedTokenBalance.toString());
-    this.refreshBuyOrderDetails(this.selectedTokenBalance);
-    this.continueEnabled = true;
-  }
-
-  maxSellAmount() {
-    $('#sharesAmountToSell').val(this.sharesBalance.toString());
-    this.refreshSellOrderDetails(this.sharesBalance);
-    this.continueEnabled = true;
-  }
-
-  selectBuyToken(value) {
-    this.selectedTokenSymbol = value;
-    this.getTokenBalance(this.selectedTokenSymbol);
-    $('#sharesAmountToBuy').val('0');
-    this.refreshBuyOrderDetails(0);
-  }
-
-  selectSellToken(tokenIndex) {
-    this.selectedTokenSymbol = this.tokenData[tokenIndex]['symbol'];
-    this.refreshSellOrderDetails(this.sellSharesAmount);
-  }
-
-  resetModals() {
-    this.buyStep = 0;
-    this.sellStep = 0;
-    this.selectedTokenSymbol = this.tokenData[0]['symbol'];
-    this.checkboxes = [false, false, false];
-    this.continueEnabled = false;
-    this.getTokenBalance(this.selectedTokenSymbol);
-  }
-
-  assetSymbolToPrice(symbol) {
-    return tokens.asset_symbol_to_price(symbol);
-  }
-
-  getTokenName(token) {
-    let result = tokens.asset_symbol_to_name(token);
-    if (isUndefined(result)) {
-      return '';
-    }
-    return result;
-  }
-
-  getTokenLogoUrl(token) {
-    let result = tokens.asset_symbol_to_logo_url(token);
-    if (isUndefined(result)) {
-      return '';
-    }
-    return result;
-  }
-
-  async getTokenBalance(token) {
-    this.selectedTokenBalance = await user.token_balance(token);
-  }
-
-  deposit() {
-    this.buyStep = 2;
-    var payAmount = this.buyTokenAmount;
-    let pending = (txHash) => {
-      if (this.buyStep == 2) {
-        this.transactionId = txHash;
-        this.buyStep = 3;
-      }
-    };
-    let confirm = () => {
-      if (this.buyStep == 3) {
-        this.buyStep = 4;
-      }
-    };
-    let error = (e) => {
-      if (this.buyStep != 0) {
-        this.buyStep = -1;
-        this.errorMsg = JSON.stringify(e);
-      }
-    }
-    switch (this.selectedTokenSymbol) {
-      case 'ETH':
-        investor_actions.depositETH(payAmount, pending, confirm, error);
-        break;
-      case 'DAI':
-        investor_actions.depositDAI(payAmount, pending, confirm, error);
-        break;
-      default:
-        investor_actions.depositToken(payAmount, this.selectedTokenSymbol, pending, confirm, error);
-        break;
-    }
-  }
-
-  sell() {
-    this.sellStep = 1;
-    var sellAmount = this.sellSharesAmount.times(this.sharesPrice);
-    let pending = (txHash) => {
-      if (this.sellStep == 1) {
-        this.transactionId = txHash;
-        this.sellStep = 2;
-      }
-    };
-    let confirm = () => {
-      if (this.sellStep == 2) {
-        this.sellStep = 3;
-      }
-      this.refreshDisplay();
-    };
-    let error = (e) => {
-      if (this.sellStep != 0) {
-        this.sellStep = -1;
-        this.errorMsg = JSON.stringify(e);
-      }
-    }
-    switch (this.selectedTokenSymbol) {
-      case 'ETH':
-        investor_actions.withdrawETH(sellAmount, pending, confirm, error);
-        break;
-      case 'DAI':
-        investor_actions.withdrawDAI(sellAmount, pending, confirm, error);
-        break;
-      default:
-        investor_actions.withdrawToken(sellAmount, this.selectedTokenSymbol, pending, confirm, error);
-        break;
-    }
-  }
-
-  agreementsChecked() {
-    for (var checked of this.checkboxes) {
-      if (!checked) {
-        return false;
-      }
-    }
-    return true;
+  switchChartTab(id) {
+    this.chartTabId = id;
+    this.chartDraw(id);
   }
 
   calcStats() {
     let BONDS_MONTHLY_INTEREST = 2.4662697e-3 // 3% annual interest rate
     let NUM_DECIMALS = 4;
-    let sharesPriceList: Array<BigNumber> = this.sharesPriceHistory.map((x) => new BigNumber(x.value).dp(NUM_DECIMALS));
+    let sharesPriceList = this.sharesPriceHistory.map((x) => new BigNumber(x.value).dp(NUM_DECIMALS));
 
     // calculate stats for Betoken
     let calcMean = function (list) {
@@ -398,34 +241,23 @@ export class FundComponent extends ApolloEnabled implements OnInit {
     // max drawdown
     this.maxDrawdown = new BigNumber(0);
     for (let i = 0; i < sharesPriceList.length; i++) {
-      let cumulativeMax = sharesPriceList.slice(0, i + 1).reduce((accumulator, curr) => BigNumber.max(accumulator, curr), new BigNumber(0)); // max of sharesPriceList[:i+1]
-      let drawdown = sharesPriceList[i].minus(cumulativeMax).div(cumulativeMax).times(100);
-      if (drawdown.lt(this.maxDrawdown)) {
+        let cumulativeMax = sharesPriceList.slice(0, i + 1).reduce((accumulator, curr) => BigNumber.max(accumulator, curr), new BigNumber(0)); // max of sharesPriceList[:i+1]
+        let drawdown = sharesPriceList[i].minus(cumulativeMax).div(cumulativeMax).times(100);
+        if (drawdown.lt(this.maxDrawdown)) {
         this.maxDrawdown = drawdown;
-      }
+        }
     }
   }
 
-  async chartDraw() {
+  chartDraw(id) {
+    let self = this;
+    let NUM_DECIMALS = 4;
+    let sharesPriceList = this.sharesPriceHistory.map((x) => new BigNumber(x.value).dp(NUM_DECIMALS));
+    sharesPriceList.push(this.sharesPrice.dp(NUM_DECIMALS));
+
+    // draw chart
     if (!this.hasDrawnChart) {
       this.hasDrawnChart = true;
-
-      let self = this;
-      let NUM_DECIMALS = 4;
-
-      let sharesPriceList = this.sharesPriceHistory.map((x) => new BigNumber(x.value));
-      sharesPriceList.push(this.sharesPrice);
-      sharesPriceList = sharesPriceList.map((x) => x.div(sharesPriceList[0]).minus(1).times(100).dp(NUM_DECIMALS));
-
-      let btcPriceList = this.btcPriceHistory.map((x) => new BigNumber(x.priceInDAI));
-      btcPriceList.push(this.assetSymbolToPrice('WBTC'));
-      btcPriceList = btcPriceList.map((x) => x.div(btcPriceList[0]).minus(1).times(100).dp(NUM_DECIMALS));
-
-      let ethPriceList = this.ethPriceHistory.map((x) => new BigNumber(x.priceInDAI));
-      ethPriceList.push(this.assetSymbolToPrice('ETH'));
-      ethPriceList = ethPriceList.map((x) => x.div(ethPriceList[0]).minus(1).times(100).dp(NUM_DECIMALS));
-
-      let now = new Date();
 
       const canvas: any = document.getElementById('roi-chart');
       const ctx = canvas.getContext('2d');
@@ -433,6 +265,7 @@ export class FundComponent extends ApolloEnabled implements OnInit {
       gradientFill.addColorStop(0, 'rgba(0, 217, 126, 0.5)');
       gradientFill.addColorStop(0.5, 'rgba(0, 217, 126, 0.25)');
       gradientFill.addColorStop(1, 'rgba(0, 217, 126, 0)');
+      let now = new Date();
 
       // Config
 
@@ -458,9 +291,10 @@ export class FundComponent extends ApolloEnabled implements OnInit {
         transparent: 'transparent',
       };
 
-      var colorScheme = (getComputedStyle(document.body).backgroundColor === 'rgb(249, 251, 253)') ? 'light' : 'dark';
+      var colorScheme = (getComputedStyle(document.body).backgroundColor == 'rgb(249, 251, 253)') ? 'light' : 'dark';
       Chart.defaults.global.defaultFontColor = colors.gray[300];
       this.performanceChart = new Chart(ctx, {
+
         type: 'line',
         data: {
           labels: this.sharesPriceHistory.map((x) => this.toDateObject(x.timestamp)).concat([now]),
@@ -468,8 +302,9 @@ export class FundComponent extends ApolloEnabled implements OnInit {
             {
               label: 'Betoken',
               borderColor: '#22c88a',
-              fill: false,
-              data: sharesPriceList
+              fill: true,
+              backgroundColor: gradientFill,
+              data: id === 0 ? sharesPriceList : this.aumHistory.map((x) => new BigNumber(x.value).dp(NUM_DECIMALS)).concat([this.AUM.dp(NUM_DECIMALS)])
             }
           ]
         },
@@ -506,7 +341,7 @@ export class FundComponent extends ApolloEnabled implements OnInit {
                 beginAtZero: false,
                 padding: 10,
                 callback: function (value, index, values) {
-                  return value + '%';
+                  return value;
                 }
               }
             }]
@@ -633,7 +468,7 @@ export class FundComponent extends ApolloEnabled implements OnInit {
                   content += '<span class="popover-body-label mr-auto">' + label + '</span>';
                 }
 
-                content += '<span class="popover-body-value">' + yLabel + '%' + '</span>';
+                content += '<span class="popover-body-value">' + yLabel + '</span>';
                 return content;
               }
             },
@@ -641,23 +476,8 @@ export class FundComponent extends ApolloEnabled implements OnInit {
         }
       });
 
-      // add ETH & BTC prices to chart
-      this.performanceChart.data.datasets.push(
-        {
-          label: 'Ether',
-          borderColor: '#8A91B6',
-          fill: false,
-          data: ethPriceList
-        }
-      );
-      this.performanceChart.data.datasets.push(
-        {
-          label: 'Bitcoin',
-          borderColor: '#FF9500',
-          fill: false,
-          data: btcPriceList
-        }
-      );
+    } else {
+      this.performanceChart.data.datasets[0].data = id == 0 ? sharesPriceList : this.aumHistory.map((x) => new BigNumber(x.value).dp(NUM_DECIMALS)).concat([this.AUM.dp(NUM_DECIMALS)]);
       this.performanceChart.update();
     }
   }

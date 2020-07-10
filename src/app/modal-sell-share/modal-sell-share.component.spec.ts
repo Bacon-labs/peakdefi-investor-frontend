@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalCreateFundComponent } from './modal-create-fund.component';
+import { ModalSellShareComponent } from './modal-sell-share.component';
 
-describe('ModalCreateFundComponent', () => {
-  let component: ModalCreateFundComponent;
-  let fixture: ComponentFixture<ModalCreateFundComponent>;
+describe('ModalSellShareComponent', () => {
+  let component: ModalSellShareComponent;
+  let fixture: ComponentFixture<ModalSellShareComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ModalCreateFundComponent ]
+      declarations: [ ModalSellShareComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ModalCreateFundComponent);
+    fixture = TestBed.createComponent(ModalSellShareComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

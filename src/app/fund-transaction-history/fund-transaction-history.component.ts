@@ -14,10 +14,10 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 @Component({
-  selector: 'app-fund',
-  templateUrl: './fund.component.html'
+  selector: 'app-fund-transaction-history',
+  templateUrl: './fund-transaction-history.component.html'
 })
-export class FundComponent extends ApolloEnabled implements OnInit {
+export class FundTransactionHistoryComponent extends ApolloEnabled implements OnInit {
   sharesPrice: BigNumber;
   avgMonthReturn: BigNumber;
   currMoROI: BigNumber;

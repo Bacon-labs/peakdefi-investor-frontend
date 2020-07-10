@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalBuyRepTokenComponent } from './modal-buy-rep-token.component';
+import { InviteComponent } from './invite.component';
 
-describe('ModalBuyRepTokenComponent', () => {
-  let component: ModalBuyRepTokenComponent;
-  let fixture: ComponentFixture<ModalBuyRepTokenComponent>;
+describe('InviteComponent', () => {
+  let component: InviteComponent;
+  let fixture: ComponentFixture<InviteComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ModalBuyRepTokenComponent ]
+      declarations: [ InviteComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ModalBuyRepTokenComponent);
+    fixture = TestBed.createComponent(InviteComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FundTradeHistoryComponent } from './fund-trade-history.component';
+import { ModalStakeComponent } from './modal-stake.component';
 
-describe('FundTradeHistoryComponent', () => {
-  let component: FundTradeHistoryComponent;
-  let fixture: ComponentFixture<FundTradeHistoryComponent>;
+describe('ModalStakeComponent', () => {
+  let component: ModalStakeComponent;
+  let fixture: ComponentFixture<ModalStakeComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FundTradeHistoryComponent ]
+      declarations: [ ModalStakeComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FundTradeHistoryComponent);
+    fixture = TestBed.createComponent(ModalStakeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
